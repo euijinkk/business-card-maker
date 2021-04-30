@@ -1,14 +1,48 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useHistory } from "react-router";
 import styled from "styled-components";
 import Footer from "./footer";
 import Header from "./header";
+
+const Login = ({ authService }) => {
+  const history = useHistory();
+  const goToMaker = (userId) => {
+    history.push({
+      pathname: "/maker",
+      state: { id: userId },
+    });
+  };
+  const onLogin = (event) => {
+    authService //
+      .login(event.currentTarget.textContent)
+      .then((data) => goToMaker(data.user.uid));
+  };
+  useEffect(() => {
+    authService.onAuthChange((user) => {
+      user && goToMaker(user.uid);
+    });
+  });
+  return (
+    <Container>
+      <Header />
+      <Main>
+        <span>Login</span>
+        <LoginLink>
+          <GoogleLogin onClick={onLogin}>Google</GoogleLogin>
+          <GithubLogin onClick={onLogin}>Github</GithubLogin>
+        </LoginLink>
+      </Main>
+      <Footer />
+    </Container>
+  );
+};
 
 const Container = styled.div`
   /* display:flex;
     flex-direction: column;
     align-items: center; */
-  width: 400px;
-  height: 300px;
+  width: 500px;
+  height: 400px;
 `;
 
 const Main = styled.section`
@@ -48,27 +82,5 @@ const GoogleLogin = styled.button`
 
 // 상속하기
 const GithubLogin = styled(GoogleLogin)``;
-
-const Login = ({ authService }) => {
-  const onLogin = (event) => {
-    authService //
-      .login(event.currentTarget.textContent)
-      .then(console.log);
-  };
-
-  return (
-    <Container>
-      <Header />
-      <Main>
-        <span>Login</span>
-        <LoginLink>
-          <GoogleLogin onClick={onLogin}>Google</GoogleLogin>
-          <GithubLogin onClick={onLogin}>Github</GithubLogin>
-        </LoginLink>
-      </Main>
-      <Footer />
-    </Container>
-  );
-};
 
 export default Login;
